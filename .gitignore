@@ -1,0 +1,9 @@
+.venv/
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+
+embeddings.npy
+matter_faiss.index
+user-filtered.csv
+users-score-2023.csv
