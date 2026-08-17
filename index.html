@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AniVerse - Next-Gen Anime Recommendation System</title>
+  <meta name="description" content="Discover top anime recommendations using Title Search, Content/Collaborative Filtering, and Hybrid Metadata algorithms.">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Ambient background glow orbs -->
+  <div class="bg-orb bg-orb-1"></div>
+  <div class="bg-orb bg-orb-2"></div>
+
+  <div class="container">
+    <!-- Header -->
+    <header>
+      <!-- <div class="logo-badge">
+        <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+        AI Recommendation Engine
+      </div> -->
+      <h1 class="main-title">AniVerse Recommender</h1>
+      <p class="subtitle">Discover your next favorite anime using Content, Collaborative, & Hybrid Filtering algorithms.</p>
+    </header>
+
+    <!-- Navigation Tab Switcher -->
+    <div class="control-tabs">
+      <button class="tab-btn active" id="tab-title" onclick="switchMode('title')">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+        Search by Title
+      </button>
+      <button class="tab-btn" id="tab-filter" onclick="switchMode('filter')">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
+        Metadata Filters
+      </button>
+    </div>
+
+    <!-- Mode 1: Search by Title Panel -->
+    <div id="panel-title-search" class="panel-card">
+      <div class="search-box-container">
+        <div style="position: relative;">
+          <div class="search-input-wrapper">
+            <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+            <input type="text" id="title-input" placeholder="Type an anime name (e.g. Naruto, Attack on Titan, Demon Slayer)..." autocomplete="off" onkeyup="handleAutocomplete(event)">
+          </div>
+          <!-- Autocomplete Suggestions List -->
+          <div id="autocomplete-list" class="autocomplete-list"></div>
+        </div>
+
+        <button class="btn-primary" onclick="triggerTitleSearch()">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+          Search Anime Recommendations
+        </button>
+      </div>
+    </div>
+
+    <!-- Mode 2: Metadata Filters Panel -->
+    <div id="panel-filter-search" class="panel-card" style="display: none;">
+      <div class="filters-grid">
+        <!-- Genre Filter -->
+        <div class="filter-group">
+          <label class="filter-label" for="filter-genre">
+            Genres
+            <span class="badge-count" id="count-genre">0</span>
+          </label>
+          <div class="custom-select-wrapper">
+            <select id="filter-genre" onchange="updateFilterState()">
+              <option value="">All Genres</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Type Filter -->
+        <div class="filter-group">
+          <label class="filter-label" for="filter-type">
+            Type
+            <span class="badge-count" id="count-type">0</span>
+          </label>
+          <div class="custom-select-wrapper">
+            <select id="filter-type" onchange="updateFilterState()">
+              <option value="">All Types (TV, Movie, OVA...)</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Studio Filter -->
+        <div class="filter-group">
+          <label class="filter-label" for="filter-studio">
+            Studio
+            <span class="badge-count" id="count-studio">0</span>
+          </label>
+          <div class="custom-select-wrapper">
+            <select id="filter-studio" onchange="updateFilterState()">
+              <option value="">All Studios</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Rating Filter -->
+        <div class="filter-group">
+          <label class="filter-label" for="filter-rating">
+            Rating
+            <span class="badge-count" id="count-rating">0</span>
+          </label>
+          <div class="custom-select-wrapper">
+            <select id="filter-rating" onchange="updateFilterState()">
+              <option value="">All Ratings</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Filter Actions & Mode Indicator -->
+      <div class="filter-actions">
+        <div class="filter-mode-info">
+          Active Recommendation Mode: 
+          <span id="mode-badge" class="mode-tag individual">Individual Function</span>
+        </div>
+        <div style="display: flex; gap: 1rem;">
+          <button class="btn-secondary" onclick="resetFilters()">Reset Filters</button>
+          <button class="btn-primary" onclick="triggerFilterSearch()">
+            Apply Filters
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Output Section -->
+    <div class="results-header">
+      <div>
+        <h2 id="results-title">Recommended Anime</h2>
+        <span class="results-count" id="results-count">Showing 0 results</span>
+      </div>
+
+      <div style="display: flex; align-items: center; gap: 0.75rem;">
+        <label for="limit-select" style="font-size: 0.85rem; color: var(--text-muted); font-weight: 600;">Total Recommendations:</label>
+        <div class="custom-select-wrapper" style="min-width: 140px;">
+          <select id="limit-select" onchange="handleLimitChange()">
+            <option value="50">50 (2 Pages)</option>
+            <option value="100" selected>100 (4 Pages)</option>
+            <option value="150">150 (6 Pages)</option>
+            <option value="200">200 (8 Pages)</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Output Grid (Image + Title below) -->
+    <div class="anime-grid" id="anime-grid">
+      <!-- Grid cards will be rendered dynamically here -->
+    </div>
+
+    <!-- Pagination Controls -->
+    <div class="pagination-container" id="pagination-container" style="display: none;"></div>
+  </div>
+
+  <!-- Detail Modal View -->
+  <div class="modal-overlay" id="modal-overlay" onclick="closeModal(event)">
+    <div class="modal-content" onclick="event.stopPropagation()">
+      <button class="modal-close" onclick="closeModal()">&times;</button>
+      <div class="modal-poster">
+        <img id="modal-img" src="" alt="Poster">
+      </div>
+      <div class="modal-info">
+        <h3 id="modal-title">Anime Title</h3>
+        <p id="modal-eng-title" style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 0.75rem;"></p>
+        
+        <div style="display: flex; gap: 0.75rem; margin-bottom: 1rem; flex-wrap: wrap;">
+          <span id="modal-score" style="background: rgba(255,183,3,0.15); color: var(--gold-star); padding: 0.3rem 0.8rem; border-radius: var(--radius-pill); font-weight: 700;">★ 0.0</span>
+          <span id="modal-type" style="background: var(--cyan-glow-bg); color: var(--cyan-glow); padding: 0.3rem 0.8rem; border-radius: var(--radius-pill); font-weight: 700;">TV</span>
+          <span id="modal-episodes" style="background: rgba(255,255,255,0.08); color: var(--text-muted); padding: 0.3rem 0.8rem; border-radius: var(--radius-pill);">Episodes</span>
+        </div>
+
+        <p id="modal-genres" style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.75rem;"></p>
+        <p id="modal-studios" style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1rem;"></p>
+        
+        <h4>Synopsis</h4>
+        <div class="modal-synopsis" id="modal-synopsis">Synopsis content...</div>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
