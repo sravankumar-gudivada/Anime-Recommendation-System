@@ -1,4 +1,6 @@
-const API_BASE = "https://anime-recommendation-system-l2u7.vercel.app";
+const API_BASE = window.location.origin.includes("127.0.0.1") || window.location.origin.includes("localhost")
+  ? "http://127.0.0.1:5000/api"
+  : "/api";
 const ITEMS_PER_PAGE = 25;
 
 let currentMode = "title";
@@ -14,11 +16,17 @@ document.addEventListener("DOMContentLoaded", () => {
 // Mode Switcher
 function switchMode(mode) {
   currentMode = mode;
-  document.getElementById("tab-title").classList.toggle("active", mode === "title");
-  document.getElementById("tab-filter").classList.toggle("active", mode === "filter");
+  document
+    .getElementById("tab-title")
+    .classList.toggle("active", mode === "title");
+  document
+    .getElementById("tab-filter")
+    .classList.toggle("active", mode === "filter");
 
-  document.getElementById("panel-title-search").style.display = mode === "title" ? "block" : "none";
-  document.getElementById("panel-filter-search").style.display = mode === "filter" ? "block" : "none";
+  document.getElementById("panel-title-search").style.display =
+    mode === "title" ? "block" : "none";
+  document.getElementById("panel-filter-search").style.display =
+    mode === "filter" ? "block" : "none";
 }
 
 // Fetch Filter Options from Backend (app3.ipynb)
@@ -97,7 +105,9 @@ function handleAutocomplete(event) {
   clearTimeout(autocompleteTimeout);
   autocompleteTimeout = setTimeout(async () => {
     try {
-      const res = await fetch(`${API_BASE}/autocomplete?q=${encodeURIComponent(query)}`);
+      const res = await fetch(
+        `${API_BASE}/autocomplete?q=${encodeURIComponent(query)}`,
+      );
       const data = await res.json();
       if (data.status === "success" && data.results.length > 0) {
         renderAutocompleteList(data.results);
@@ -134,7 +144,10 @@ function renderAutocompleteList(items) {
 
 // Close autocomplete on click outside
 document.addEventListener("click", (e) => {
-  if (!e.target.closest("#title-input") && !e.target.closest("#autocomplete-list")) {
+  if (
+    !e.target.closest("#title-input") &&
+    !e.target.closest("#autocomplete-list")
+  ) {
     const listContainer = document.getElementById("autocomplete-list");
     if (listContainer) listContainer.style.display = "none";
   }
@@ -155,15 +168,19 @@ function handleLimitChange() {
 
 // Trigger Search by Title
 async function triggerTitleSearch(customTitle = null) {
-  const title = customTitle || document.getElementById("title-input").value.trim();
+  const title =
+    customTitle || document.getElementById("title-input").value.trim();
   if (!title) return;
 
   renderSkeletons();
-  document.getElementById("results-title").textContent = `Recommendations for "${title}"`;
+  document.getElementById("results-title").textContent =
+    `Recommendations for "${title}"`;
 
   const limit = getSelectedLimit();
   try {
-    const res = await fetch(`${API_BASE}/search?title=${encodeURIComponent(title)}&top_n=${limit}`);
+    const res = await fetch(
+      `${API_BASE}/search?title=${encodeURIComponent(title)}&top_n=${limit}`,
+    );
     const data = await res.json();
 
     if (data.status === "success" && data.results.length > 0) {
@@ -171,11 +188,15 @@ async function triggerTitleSearch(customTitle = null) {
       renderPage(1);
     } else {
       animeDataCache = [];
-      renderEmptyState(data.message || "No anime found matching your title query.");
+      renderEmptyState(
+        data.message || "No anime found matching your title query.",
+      );
     }
   } catch (err) {
     console.error("Search API error:", err);
-    renderEmptyState("Failed to connect to backend engine. Ensure server.py is running.");
+    renderEmptyState(
+      "Failed to connect to backend engine. Ensure server.py is running.",
+    );
   }
 }
 
@@ -199,18 +220,21 @@ async function triggerFilterSearch() {
     types: type ? [type] : [],
     studios: studio ? [studio] : [],
     ratings: rating ? [rating] : [],
-    top_n: limit
+    top_n: limit,
   };
 
   const activeCount = [genre, type, studio, rating].filter(Boolean).length;
-  const titleText = activeCount > 1 ? "Hybrid Filter Recommendations" : "Individual Filter Recommendations";
+  const titleText =
+    activeCount > 1
+      ? "Hybrid Filter Recommendations"
+      : "Individual Filter Recommendations";
   document.getElementById("results-title").textContent = titleText;
 
   try {
     const res = await fetch(`${API_BASE}/filter`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload)
+      body: JSON.stringify(payload),
     });
     const data = await res.json();
 
@@ -219,7 +243,9 @@ async function triggerFilterSearch() {
       renderPage(1);
     } else {
       animeDataCache = [];
-      renderEmptyState(data.message || "No anime matched the selected filters.");
+      renderEmptyState(
+        data.message || "No anime matched the selected filters.",
+      );
     }
   } catch (err) {
     console.error("Filter API error:", err);
@@ -256,13 +282,16 @@ function renderPage(pageNumber) {
   const pageItems = animeDataCache.slice(startIndex, endIndex);
 
   // Update counter
-  document.getElementById("results-count").textContent = `Showing ${startIndex + 1}–${endIndex} of ${totalItems} results (Page ${pageNumber} of ${totalPages})`;
+  document.getElementById("results-count").textContent =
+    `Showing ${startIndex + 1}–${endIndex} of ${totalItems} results (Page ${pageNumber} of ${totalPages})`;
 
   renderGridCards(pageItems, startIndex);
   renderPaginationControls(totalPages);
 
   // Smooth scroll to top of grid
-  document.getElementById("results-title").scrollIntoView({ behavior: "smooth", block: "start" });
+  document
+    .getElementById("results-title")
+    .scrollIntoView({ behavior: "smooth", block: "start" });
 }
 
 // Render Anime Cards Grid Output
@@ -281,7 +310,8 @@ function renderGridCards(animeList, baseIndex = 0) {
       .map((g) => `<span class="genre-chip">${g.trim()}</span>`)
       .join("");
 
-    const fallbackImg = "https://images.unsplash.com/photo-1578632767115-351597cf2477?w=500&auto=format&fit=crop&q=60";
+    const fallbackImg =
+      "https://images.unsplash.com/photo-1578632767115-351597cf2477?w=500&auto=format&fit=crop&q=60";
 
     card.innerHTML = `
       <div class="card-poster">
@@ -370,19 +400,31 @@ function openModal(globalIndex) {
 
   document.getElementById("modal-img").src = anime.image_url;
   document.getElementById("modal-title").textContent = anime.name;
-  document.getElementById("modal-eng-title").textContent = anime.english_name || "";
-  document.getElementById("modal-score").textContent = `★ ${anime.score || "N/A"}`;
+  document.getElementById("modal-eng-title").textContent =
+    anime.english_name || "";
+  document.getElementById("modal-score").textContent =
+    `★ ${anime.score || "N/A"}`;
   document.getElementById("modal-type").textContent = anime.type || "N/A";
-  document.getElementById("modal-episodes").textContent = `${anime.episodes || "N/A"} Episodes`;
-  document.getElementById("modal-genres").textContent = `Genres: ${anime.genres || "N/A"}`;
-  document.getElementById("modal-studios").textContent = `Studios: ${anime.studios || "N/A"} | Rating: ${anime.rating || "N/A"}`;
-  document.getElementById("modal-synopsis").textContent = anime.synopsis && anime.synopsis !== "UNKNOWN" ? anime.synopsis : "No detailed synopsis available for this anime.";
+  document.getElementById("modal-episodes").textContent =
+    `${anime.episodes || "N/A"} Episodes`;
+  document.getElementById("modal-genres").textContent =
+    `Genres: ${anime.genres || "N/A"}`;
+  document.getElementById("modal-studios").textContent =
+    `Studios: ${anime.studios || "N/A"} | Rating: ${anime.rating || "N/A"}`;
+  document.getElementById("modal-synopsis").textContent =
+    anime.synopsis && anime.synopsis !== "UNKNOWN"
+      ? anime.synopsis
+      : "No detailed synopsis available for this anime.";
 
   document.getElementById("modal-overlay").classList.add("active");
 }
 
 function closeModal(event) {
-  if (!event || event.target.id === "modal-overlay" || event.target.classList.contains("modal-close")) {
+  if (
+    !event ||
+    event.target.id === "modal-overlay" ||
+    event.target.classList.contains("modal-close")
+  ) {
     document.getElementById("modal-overlay").classList.remove("active");
   }
 }
