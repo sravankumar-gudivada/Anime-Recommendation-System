@@ -1,6 +1,4 @@
-const API_BASE = window.location.origin.includes("127.0.0.1") || window.location.origin.includes("localhost")
-  ? "http://127.0.0.1:5000/api"
-  : "/api";
+const API_BASE = "https://anime-recommendation-system-l2u7.vercel.app/api";
 const ITEMS_PER_PAGE = 25;
 
 let currentMode = "title";
