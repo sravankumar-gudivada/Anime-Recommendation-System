@@ -1,4 +1,4 @@
-const API_BASE = "http://127.0.0.1:5000/api";
+const API_BASE = "https://anime-recommendation-system-l2u7.vercel.app";
 const ITEMS_PER_PAGE = 25;
 
 let currentMode = "title";
