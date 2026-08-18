@@ -3,7 +3,8 @@ from flask_cors import CORS
 import os
 from engine import AnimeEngine
 
-app = Flask(__name__, static_folder=".")
+CLIENT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "client"))
+app = Flask(__name__, static_folder=CLIENT_DIR)
 CORS(app)
 
 print("Starting Anime Recommendation Engine...")
@@ -11,13 +12,14 @@ engine = AnimeEngine()
 
 @app.route("/")
 def serve_index():
-    return send_from_directory(".", "index.html")
+    return send_from_directory(CLIENT_DIR, "index.html")
 
 @app.route("/<path:path>")
 def serve_static(path):
-    if os.path.exists(path):
-        return send_from_directory(".", path)
-    return send_from_directory(".", "index.html")
+    target = os.path.join(CLIENT_DIR, path)
+    if os.path.exists(target):
+        return send_from_directory(CLIENT_DIR, path)
+    return send_from_directory(CLIENT_DIR, "index.html")
 
 @app.route("/api/options", methods=["GET"])
 def get_options():

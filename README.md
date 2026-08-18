@@ -39,13 +39,18 @@ Designed with a cyber/anime glassmorphism aesthetic, **AniVerse** provides insta
 
 ```
 Anime Recommendation Sysytem/
-├── anime-dataset-2023.csv      # Primary anime dataset (24,905 entries)
-├── engine.py                   # Recommendation engine & ML algorithms
-├── server.py                   # Flask REST API server
-├── index.html                  # Main Web UI
-├── style.css                   # Cyber/Anime styling & responsive layout
-├── app.js                      # Frontend logic, API calls, & pagination
-├── requirements.txt            # Required Python dependencies
+├── client/                     # Frontend client application
+│   ├── index.html              # Main Web UI
+│   ├── style.css               # Cyber/Anime styling & responsive layout
+│   └── app.js                  # Frontend logic, API calls, & pagination
+├── server/                     # Backend server & ML engine
+│   ├── server.py               # Flask REST API server
+│   ├── engine.py               # Recommendation engine & ML algorithms
+│   ├── requirements.txt        # Required Python dependencies
+│   ├── anime-dataset-2023.csv  # Primary anime dataset (24,905 entries)
+│   ├── user-filtered.csv       # Filtered user interactions dataset
+│   ├── users-details-2023.csv  # User details dataset
+│   └── users-score-2023.csv    # User scoring dataset
 ├── README.md                   # Project documentation
 ├── app2.ipynb                  # Original Notebook for Content/Collaborative Filtering
 └── app3.ipynb                  # Original Notebook for Metadata Filtering
@@ -58,13 +63,13 @@ Anime Recommendation Sysytem/
 ### 1. Install Dependencies
 Ensure Python 3.8+ is installed, then run:
 ```bash
-pip install -r requirements.txt
+pip install -r server/requirements.txt
 ```
 
 ### 2. Run Web Server
 Launch the Flask backend server:
 ```bash
-python server.py
+python server/server.py
 ```
 
 ### 3. Open in Browser
